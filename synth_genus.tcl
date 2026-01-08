@@ -65,11 +65,18 @@ puts "Reading RTL Files"
 puts "=========================================="
 source cva6.f
 
+
 puts "=========================================="
 puts "Elaborating Design"
 puts "=========================================="
 
 elaborate cva6
+
+puts "=========================================="
+puts "Setting Tie Cells"
+puts "=========================================="
+
+add_tieoffs -high_low sky130_fd_sc_hd__conb_1 -all -place_cells
 
 # Check the top-level design name
 set top_design [get_db designs]
@@ -239,7 +246,7 @@ write_sdc > ${RESULTS_DIR}/${DESIGN_NAME}_synth.sdc
 write_sdf > ${RESULTS_DIR}/${DESIGN_NAME}_synth.sdf
 
 # Write design database
-write_design -innovus ${RESULTS_DIR}/${DESIGN_NAME}_synth.genus
+write_db -common ${RESULTS_DIR}/${DESIGN_NAME}_synth.genus
 
 puts "=========================================="
 puts "Synthesis Complete!"
