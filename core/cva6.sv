@@ -327,7 +327,9 @@ module cva6
     // Debug (async) request - SUBSYSTEM
     input logic debug_req_i,
     // Probes to build RVFI, can be left open when not used - RVFI
+    `ifndef TARGET_SYNTHESIS
     output rvfi_probes_t rvfi_probes_o,
+    `endif
     // CVXIF request - SUBSYSTEM
     output cvxif_req_t cvxif_req_o,
     // CVXIF response - SUBSYSTEM

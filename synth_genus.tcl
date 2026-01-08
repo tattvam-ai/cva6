@@ -39,9 +39,12 @@ set clk_period $PERIOD
 set input_delay $INPUT_DELAY
 set output_delay $OUTPUT_DELAY
 
+# Prevent ungrouping of hierarchical modules
+set_db auto_ungroup none
+
 # Output file names with timestamp
-set REPORTS_DIR "reports_${timestamp}"
-set RESULTS_DIR "results_${timestamp}"
+set REPORTS_DIR "reports_${timestamp}_hier"
+set RESULTS_DIR "results_${timestamp}_hier"
 
 puts "Reports Directory: ${REPORTS_DIR}"
 puts "Results Directory: ${RESULTS_DIR}"
@@ -65,7 +68,6 @@ source cva6.f
 puts "=========================================="
 puts "Elaborating Design"
 puts "=========================================="
-# set_db auto_ungroup none
 
 elaborate cva6
 
@@ -76,6 +78,25 @@ puts "Top design elaborated: $top_design"
 report_hierarchy > ${REPORTS_DIR}/hierarchy.rpt
 # Set the current design
 # set_db design:${DESIGN_NAME} 
+
+# puts "=========================================="
+# puts "Removing RVFI Verification Ports"
+# puts "=========================================="
+
+# # Remove rvfi_probes_o interface (contributes ~4k-8k ports)
+# set rvfi_ports [get_ports -quiet rvfi_probes_o*]
+# if {[sizeof_collection $rvfi_ports] > 0} {
+#     puts "Found [sizeof_collection $rvfi_ports] RVFI ports - removing them"
+#     delete_obj $rvfi_ports
+#     puts "RVFI ports removed successfully"
+# } else {
+#     puts "No RVFI ports found"
+# }
+
+# # Verify port count after removal
+# set remaining_ports [get_ports *]
+# puts "Remaining top-level ports: [sizeof_collection $remaining_ports]"
+
 
 puts "=========================================="
 puts "Setting Design Constraints"
@@ -145,25 +166,25 @@ puts "Cleaning Up Parameterized Module Names"
 puts "=========================================="
 
 # Find all designs with CVA6Cfg in the name
-set bad_modules [get_db designs -if {.name =~ "*CVA6Cfg*"}]
+# set bad_modules [get_db designs -if {.name =~ "*CVA6Cfg*"}]
 
-if {[sizeof_collection $bad_modules] > 0} {
-    puts "Found [sizeof_collection $bad_modules] parameterized modules:"
-    foreach mod $bad_modules {
-        set mod_name [get_db $mod .name]
-        puts "  Module: $mod_name"
-    }
+# if {[sizeof_collection $bad_modules] > 0} {
+#     puts "Found [sizeof_collection $bad_modules] parameterized modules:"
+#     foreach mod $bad_modules {
+#         set mod_name [get_db $mod .name]
+#         puts "  Module: $mod_name"
+#     }
     
-    puts "\nUngrouping parameterized modules..."
-    foreach mod $bad_modules {
-        set mod_name [get_db $mod .name]
-        puts "  Ungrouping: $mod_name"
-        ungroup $mod_name -flatten
-    }
-    puts "Parameterized modules ungrouped successfully"
-} else {
-    puts "No parameterized modules found"
-}
+#     puts "\nUngrouping parameterized modules..."
+#     foreach mod $bad_modules {
+#         set mod_name [get_db $mod .name]
+#         puts "  Ungrouping: $mod_name"
+#         ungroup $mod_name -flatten
+#     }
+#     puts "Parameterized modules ungrouped successfully"
+# } else {
+#     puts "No parameterized modules found"
+# }
 
 report_timing > ${REPORTS_DIR}/timing_generic.rpt
 report_area > ${REPORTS_DIR}/area_generic.rpt
