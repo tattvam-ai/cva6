@@ -43,8 +43,8 @@ set output_delay $OUTPUT_DELAY
 set_db auto_ungroup none
 
 # Output file names with timestamp
-set REPORTS_DIR "reports_${timestamp}_hier"
-set RESULTS_DIR "results_${timestamp}_hier"
+set REPORTS_DIR "reports_${timestamp}"
+set RESULTS_DIR "results_${timestamp}"
 
 puts "Reports Directory: ${REPORTS_DIR}"
 puts "Results Directory: ${RESULTS_DIR}"
@@ -96,7 +96,16 @@ report_hierarchy > ${REPORTS_DIR}/hierarchy.rpt
 # # Verify port count after removal
 # set remaining_ports [get_ports *]
 # puts "Remaining top-level ports: [sizeof_collection $remaining_ports]"
+puts "=========================================="
+puts "Check Port Count"
+puts "=========================================="
 
+set all_ports [get_ports *]
+puts "Total ports: [sizeof_collection $all_ports]"
+
+# Search specifically for rvfi ports (should return 0)
+set rvfi_ports [get_ports -quiet rvfi*]
+puts "RVFI ports found: [sizeof_collection $rvfi_ports]"
 
 puts "=========================================="
 puts "Setting Design Constraints"
