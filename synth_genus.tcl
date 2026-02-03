@@ -29,7 +29,7 @@ puts "=========================================="
 set_db syn_opt_effort high
 
 # Clock and timing parameters (adjust as needed)
-set PERIOD 50.0           
+set PERIOD 40.0           
 set INPUT_DELAY 1.0      
 set OUTPUT_DELAY 1.0      
 
@@ -58,8 +58,9 @@ puts "Reading Technology Library"
 puts "=========================================="
 
 # Read Sky130 technology library
-read_libs ${ROOT}/../../open_pdks/sky130/sky130A/libs.ref/sky130_fd_sc_hd/lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+#read_libs ${ROOT}/../../open_pdks/sky130/sky130A/libs.ref/sky130_fd_sc_hd/lib/sky130_fd_sc_hd__tt_025C_1v80.lib
 
+read_libs ${ROOT}/../sky130_scl_9T_0.1.1/sky130_scl_9T/lib/sky130_tt_1.8_25_nldm.lib
 puts "=========================================="
 puts "Reading RTL Files"
 puts "=========================================="
@@ -76,7 +77,7 @@ puts "=========================================="
 puts "Setting Tie Cells"
 puts "=========================================="
 
-add_tieoffs -high_low sky130_fd_sc_hd__conb_1 -all -place_cells
+#add_tieoffs -high_low sky130_fd_sc_hd__conb_1 -all -place_cells
 
 # Check the top-level design name
 set top_design [get_db designs]
