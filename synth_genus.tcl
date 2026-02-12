@@ -60,25 +60,30 @@ puts "=========================================="
 # Read Sky130 technology library
 #read_libs ${ROOT}/../../open_pdks/sky130/sky130A/libs.ref/sky130_fd_sc_hd/lib/sky130_fd_sc_hd__tt_025C_1v80.lib
 
-read_libs ${ROOT}/../sky130_scl_9T_0.1.1/sky130_scl_9T/lib/sky130_tt_1.8_25_nldm.lib
+read_libs \
+    ${ROOT}/../sky130_scl_9T_0.1.1/sky130_scl_9T/lib/sky130_tt_1.8_25_nldm.lib \
+    ${ROOT}/vendor/openram/sky130_sram_2kbyte_1rw_64x256_8/sky130_sram_2kbyte_1rw_64x256_8_TT_1p8V_25C.lib
+
+# If needed, enable RTL power pins:
+# set_db hdl_define { USE_POWER_PINS }
 puts "=========================================="
 puts "Reading RTL Files"
 puts "=========================================="
 source cva6.f
-
 
 puts "=========================================="
 puts "Elaborating Design"
 puts "=========================================="
 
 elaborate cva6
+current_design cva6
+link
 
 puts "=========================================="
 puts "Setting Tie Cells"
 puts "=========================================="
 
 #add_tieoffs -high_low sky130_fd_sc_hd__conb_1 -all -place_cells
-
 # Check the top-level design name
 set top_design [get_db designs]
 puts "Top design elaborated: $top_design"
@@ -122,24 +127,10 @@ puts "=========================================="
 # Create main clock
 create_clock [get_ports ${clk_port}] -name ${clk_name} -period ${clk_period}
 
-# Set don't touch on SRAM black boxes to keep them as is
-set_db [get_cells -hier *i_tag_sram] .dont_touch true
-set_db [get_cells -hier *i_data_sram] .dont_touch true
-set_db [get_cells -hier *data_sram] .dont_touch true
-set_db [get_cells -hier *tag_sram] .dont_touch true
+# Optional: protect only the leaf macro instances (not recommended unless needed)
+# set_db [get_cells -hier *u_sram*] .dont_touch true
 
-# Constraint timing to/from SRAM black boxes
-# Input delays from SRAMs
-set sram_outputs [get_pins -hier -filter "name=~*sram*/rdata_o*"]
-if {[sizeof_collection $sram_outputs] > 0} {
-    set_input_delay -clock ${clk_name} -max ${input_delay} $sram_outputs
-}
-
-# Output delays to SRAMs
-set sram_inputs [get_pins -hier -filter "name=~*sram*/addr_i*"]
-if {[sizeof_collection $sram_inputs] > 0} {
-    set_output_delay ${output_delay} -max -clock ${clk_name} $sram_inputs
-}
+# Rely on macro .lib timing; do not add artificial I/O delays on internal SRAM pins
 
 # Set false path on RVFI probes (verification interface, not critical)
 set rvfi_ports [get_ports -quiet rvfi_probes_o*]

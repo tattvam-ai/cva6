@@ -246,6 +246,18 @@ sources:
           - common/local/util/tc_sram_fpga_wrapper.sv
           - vendor/pulp-platform/fpga-support/rtl/SyncSpRamBeNx64.sv
 
+      # Synthesis: use a stub so Genus binds to the .lib and doesn’t synthesize internals
+      - target: synthesis
+        files:
+          - vendor/openram/sky130_sram_2kbyte_1rw_64x256_8_stub.v
+        #defines:
+        #  - USE_POWER_PINS  # only if your stub exposes power pins
+
+      # Simulation (and other non-synthesis targets): use the full behavioral model
+      - target: not(synthesis)
+        files:
+          - vendor/openram/sky130_sram_2kbyte_1rw_64x256_8/sky130_sram_2kbyte_1rw_64x256_8.v
+
       - target: not(synthesis)
         include_dirs:
           - core/include

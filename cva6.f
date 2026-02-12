@@ -601,3 +601,18 @@ read_hdl -language sv \
     ]
 
 set search_path $search_path_initial
+lappend search_path "$ROOT/vendor/openram"
+set_db init_hdl_search_path $search_path
+
+read_hdl -verilog \
+    -define { \
+        TARGET_CV64A6_IMAFDC_SV39 \
+        TARGET_CVA6 \
+        TARGET_GENUS \
+        TARGET_SYNTHESIS \
+    } \
+    [list \
+        "$ROOT/vendor/openram/sky130_sram_2kbyte_1rw_64x256_8_stub.v" \
+    ]
+
+set search_path $search_path_initial
